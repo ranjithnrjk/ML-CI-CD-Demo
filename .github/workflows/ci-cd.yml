@@ -1,0 +1,37 @@
+name: CI/CD for Iris Model
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  train-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Train model
+      run: |
+        python train.py
+
+    - name: Save model artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: model
+        path: model/best_model.pkl
+
+    - name: Deploy to Streamlit
+      run: |
+        streamlit run app.py
